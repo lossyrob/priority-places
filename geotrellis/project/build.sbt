@@ -6,3 +6,5 @@ resolvers += Resolver.url("sbt-plugin-releases",
 addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.8.3")
 
 addSbtPlugin("io.spray" % "sbt-revolver" % "0.7.1")
+
+fork in run :=true

@@ -21,15 +21,24 @@ import spray.http._
 import MediaTypes._
 import CachingDirectives._
 
+import scala.concurrent._
+import spray.http._
+import spray.client.pipelining._
+
+import java.net.URLEncoder
+
 class PriorityPlacesServiceActor extends Actor with PriorityPlacesService {
   def actorRefFactory = context
   def receive = runRoute(serviceRoute)
 }
 
 trait PriorityPlacesService extends HttpService {
+  def parcelUrl(lat: Double, lng: Double) = 
+    s"http://opendataserver.ashevillenc.gov/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=coagis:bc_property&maxFeatures=1&outputFormat=json&srsName=EPSG:4326&BBOX=${lng-0.00001},${lat-0.00001},$lng,$lat,EPSG:4326"
+
   implicit def executionContext = actorRefFactory.dispatcher
 
-  val directoryName = "../static"
+  val directoryName = "../static/"
 
   val serviceRoute = {
     get {
@@ -61,6 +70,37 @@ trait PriorityPlacesService extends HttpService {
                     failWith(new RuntimeException(message))
               }
             }
+          }
+        } ~
+        path("generateToken") {
+          complete {
+            val pipeline = sendReceive ~> unmarshal[String]
+            pipeline(Get(Esri.generateTokenUrl))
+          }
+        } ~
+        path("esriReportCatalog") {
+          complete {
+            Esri.getAvailableReports
+          }
+        } ~
+        path("getParcel") {
+          parameters('lat.as[Double], 'lng.as[Double]) {
+            (lat,lng) =>
+              complete {
+                val pipeline = sendReceive ~> unmarshal[String]
+                pipeline(Get(parcelUrl(lat,lng)))
+              }
+          }
+        } ~
+        path("geocode") {
+          parameters('address) {
+            (address) =>
+              complete {
+                val pipeline = sendReceive ~> unmarshal[String]
+                val encoded = URLEncoder.encode(address)
+                val url = s"http://gis.ashevillenc.gov/COA_ArcGIS_Server/rest/services/Buncombe_Address_WGS84/GeocodeServer/findAddressCandidates?f=json&Street=$encoded"
+                pipeline(Get(url))
+              }
           }
         } ~
         path("wo") {

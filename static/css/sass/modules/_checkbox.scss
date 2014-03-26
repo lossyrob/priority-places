@@ -1,33 +1,71 @@
-input[type="checkbox"].css-checkbox {
-	position: absolute; 
-	overflow: hidden; 
-	clip: rect(0 0 0 0); 
-	height: 1px; 
-	width: 1px; 
-	margin: -1px; 
-	padding: 0;
-	border: 0;
+@mixin checkboxes {
+	input[type='radio'] {
+        opacity: 0;
+        float: left;
+        width: 0;
 
-	&:checked {
-		+ label.css-label {
-			background-position: 0 -20px;
-		}
+        & + label {
+            margin: 0;
+            clear: none;
+            padding: 0 0 0 28px;
+            min-height: 20px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #232323;
+            cursor: pointer;
+            vertical-align: top;
+            background: url(../images/radio-off.png) left top no-repeat;
+        }
+        
+        &:disabled + label {
+            opacity: 0.4;
+            cursor: default;
+
+            &:hover {
+                background-image: url(../images/radio-off.png);
+            }
+        }
+
+        & + label:hover {
+            background-image: url(../images/radio-hover.png);
+        }
+        &:checked + label {
+            background-image: url(../images/radio.png);
+        }
+        &:disabled:checked + label {
+            opacity: 0.4;
+            cursor: default;
+
+            &:hover {
+                background-image: url(../images/radio.png);
+            }
+        }
+    }
+
+    input[type='checkbox'] {
+        opacity: 0;
+        float: left;
+        width: 0;
+
+        & + label {
+            margin: 0;
+            clear: none;
+            padding: 0 0 0 28px;
+            min-height: 20px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #232323;
+            cursor: pointer;
+            vertical-align: top;
+            background: url(../images/check-off.png) left top no-repeat;
+        }
+        &:disabled + label {
+            opacity: 0.4;
+            cursor: default;
+        }
+
+        &:checked + label {
+            background-image: url(../images/check.png);
+        }
 	}
-
-	+ label.css-label {
-		padding-left: 25px;
-		height: 20px; 
-		display: inline-block;
-		line-height: 20px;
-		background-repeat: no-repeat;
-		background-position: 0 0;
-		font-size: 12px;
-		font-weight: 700;
-		vertical-align: middle;
-		cursor: pointer;
-	}
-}
-
-.css-label{ 
-	background-image: url(http://csscheckbox.com/checkboxes/web-two-style.png);
 }
